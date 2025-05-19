@@ -6,17 +6,24 @@ Simple Front-End Javascript Framework, designed for smaller projects where you m
 
 ```js
 function home() {
-  let count = 0;
-  let countSpan = span(count);
-
-  function updateCount() {
-    count++;
-    countSpan.innerHTML = count;
-  }
+  const [count, setCount] = useState(0);
+  const [text, setText] = useState("hej");
 
   return div(
     h1("Welcome to my cool site built with gelly.js!"),
-    div(countSpan, button({ onclick: updateCount }, "Plus plus"))
+    div(
+      span("hej ", count),
+      button({ onclick: () => setCount(count() + 1) }, "Plus plus")
+    ),
+    div(
+      span("Reactive text: ", text),
+      div(
+        input({
+          placeholder: "type in me!",
+          oninput: (e) => setText(e.target.value),
+        })
+      )
+    )
   );
 }
 
