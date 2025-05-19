@@ -45,6 +45,11 @@ function element(tag) {
       .forEach((child) => {
         if (child instanceof Node) {
           el.appendChild(child);
+        } else if (typeof child === "function") {
+          const value = child(el);
+          const dynamicNode = document.createTextNode(String(value));
+          dynamicNode.__isDynamic = true;
+          el.appendChild(dynamicNode);
         } else {
           el.appendChild(document.createTextNode(String(child)));
         }
