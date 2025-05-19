@@ -59,6 +59,48 @@ function element(tag) {
   };
 }
 
+function useState(initalValue) {
+  let subscribers = [];
+
+  const observed = new Proxy(
+    { value: initalValue },
+    {
+      set(target, property, value) {
+        target[property] = value;
+      },
+
+      get(target, property) {
+        return target[property];
+      },
+    }
+  );
+
+  const setState = (value) => {
+    observed.value = value;
+
+    subscribers.forEach((node) => {
+      Array.from(node.childNodes).forEach((child) => {
+        if (child.nodeType === Node.TEXT_NODE && child.__isDynamic) {
+          node.removeChild(child);
+        }
+      });
+
+      const dynamicNode = document.createTextNode(String(observed.value));
+      dynamicNode.__isDynamic = true;
+      node.appendChild(dynamicNode);
+    });
+  };
+
+  const getState = (parent) => {
+    if (parent && !subscribers.includes(parent)) {
+      subscribers.push(parent);
+    }
+    return observed.value;
+  };
+
+  return [getState, setState];
+}
+
 function createElements() {
   tags.forEach((tag) => {
     window[tag] = element(tag);
